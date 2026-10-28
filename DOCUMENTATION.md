@@ -28,7 +28,7 @@ The reference for **cloudflared**, the Cloudflare Tunnel connector that carries 
 
 | Item | Value |
 |---|---|
-| Image | `cloudflare/cloudflared:latest` |
+| Image | `cloudflare/cloudflared:latest`, pulled fresh on every deploy (`pull_policy: always`) |
 | Container | `cloudflared`, compose project `cloudflared` |
 | Command | `tunnel --no-autoupdate run` (a tunnel managed in the Cloudflare dashboard) |
 | Network | `spark`, so it reaches containers by name |
@@ -62,7 +62,7 @@ Prefer a container name over `host.docker.internal`: it doesn't need a published
 
 ## 4. Deploying
 
-Lighthouse deploys every push to `main`. As `tier: infra`, it goes after sparkdb and before the apps, alone. The swap drops open connections for a moment; the tunnel reconnects within seconds.
+Lighthouse deploys every push to `main`, pulling the newest cloudflared image each time. As `tier: infra`, it goes after sparkdb and before the apps, alone. The swap drops open connections for a moment; the tunnel reconnects within seconds.
 
 **Changing the token:** create a new one in the Cloudflare dashboard, `update CLOUDFLARED_CLOUDFLARE_TUNNEL_TOKEN <token>` in Cove, then `lh deploy cloudflared`.
 
@@ -91,6 +91,6 @@ Lighthouse deploys every push to `main`. As `tier: infra`, it goes after sparkdb
 
 ## 7. Known limitations
 
-1. **The image is `latest`, not pinned:** a redeploy can pick up a new cloudflared version. Pin it (e.g. `cloudflare/cloudflared:2026.x.y`) if that ever causes trouble.
+1. **The image is `latest`, not pinned:** every deploy pulls the newest cloudflared version, so a redeploy of the same tag can run a different cloudflared. Pin it (e.g. `cloudflare/cloudflared:2026.x.y`) if that ever causes trouble.
 2. **Routes aren't in git:** they live in the Cloudflare dashboard.
 3. **No healthcheck:** Lighthouse only checks that the container stays running.
