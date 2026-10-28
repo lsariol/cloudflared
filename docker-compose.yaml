@@ -7,6 +7,7 @@ services:
   cloudflared:
     container_name: cloudflared
     image: cloudflare/cloudflared:latest
+    pull_policy: always
     command: tunnel --no-autoupdate run
     environment:
       - TUNNEL_TOKEN=${CLOUDFLARED_CLOUDFLARE_TUNNEL_TOKEN}
